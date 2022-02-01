@@ -58,10 +58,10 @@ def test_login_anomymoususer(api_client , django_user_model):
     from django.contrib import auth
     user = auth.get_user(api_client) # it returns User or AnonymousUser
 
-    url = reverse('login')
+    url = reverse('login' )
     response = api_client.post(url , {"username":"ritesh" , "password":"pandey1200"})
     url = reverse('login')
     response = api_client.post(url , {"username":"ritesh" , "password":"pandey1200"})
 
-    assert response.status_code == 401
+    assert response.status_code == 400
     
