@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password
+from django.shortcuts import get_object_or_404
+
 
 
 
@@ -46,8 +48,6 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        if not request.user :
-            return Response({"stat" : "please login first"} , status=status.HTTP_200_OK)
         auth.logout(request)
         return Response({"status":"user logged out"},status=status.HTTP_200_OK)
 
@@ -58,15 +58,13 @@ class ChangePasswordView(APIView):
 
     @csrf_exempt
     def post(self , request , pk):
-        user = User.objects.get(pk = pk)
-        if user is None:
-            return response({"Not found" : "user not found"} , status=status.HTTP_400_BAD_REQUEST)
+        user = get_object_or_404(User, pk=pk)
         if user.username != request.user.username:
-            return response({"Not found" : "user not login with correct account"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Not found" : "user not login with correct account"} , status=status.HTTP_400_BAD_REQUEST)
         if not check_password(request.data.get("old_password"),user.password):
-            return response({"error" : "old password not match"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error" : "old password not match"} , status=status.HTTP_400_BAD_REQUEST)
         if request.data.get("password") != request.data.get("password2"):
-            return response({"Not match" : "password and password2 did not match"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Not match" : "password and password2 did not match"} , status=status.HTTP_400_BAD_REQUEST)
 
 
         # user.set_password(request.data.get("password"))
@@ -80,21 +78,17 @@ class ChangePasswordView(APIView):
             user =  auth.authenticate(username=username, password=request.data.get("password"))
             if user is not None:
                 auth.login(request, user)
-            return Response({"new_password" : request.data.get("password")} , status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"new_password" : request.data.get("password")} , status=status.HTTP_202_ACCEPTED)
 
 
 
 class ResetPasswordView(APIView):
 
-
     @csrf_exempt
     def post(self , request ):
-        user = User.objects.filter(username = request.data.get("username")).first()
-        if user is None:
-            return response({"Not found" : "user not found"} , status=status.HTTP_400_BAD_REQUEST)
+        user = get_object_or_404(User, username = request.data.get("username"))
         if request.data.get("password") != request.data.get("password2"):
-            return response({"Not match" : "password and password2 did not match"} , status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Not match" : "password and password2 did not match"} , status=status.HTTP_400_BAD_REQUEST)
 
 
         # user.set_password(request.data.get("password"))
@@ -108,5 +102,4 @@ class ResetPasswordView(APIView):
             user =  auth.authenticate(username=username, password=request.data.get("password"))
             if user is not None:
                 auth.login(request, user)
-            return Response({"new_password" : request.data.get("password")} , status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"new_password" : request.data.get("password")} , status=status.HTTP_202_ACCEPTED)
