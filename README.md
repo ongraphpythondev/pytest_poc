@@ -1,11 +1,11 @@
 # Pytest
 The Pytest is similar to unit testing framework by which we can test our code by writing test cases.
-This poc includes testing of :
-    1. Login
-    2. Registraion
-    3. Logout
-    4. Forget password
-I use pytese-django for testing in Django.
+This poc includes testing of :<br>
+    1. Login<br>
+    2. Registraion<br>
+    3. Logout<br>
+    4. Forget password<br>
+I use pytese-django for testing in Django.<br>
 
 # Prerequisites
 You will need the following programmes properly installed on your computer.<br>
